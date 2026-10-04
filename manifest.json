@@ -1,0 +1,58 @@
+{
+  "manifest_version": 3,
+  "name": "Squadrats Komoot Overlay",
+  "description": "Overlay Squadrats of manually added users (UID + alias, stored client-side) on the Komoot planning map.",
+  "version": "0.1.0",
+  "permissions": ["storage"],
+  "host_permissions": ["https://squadrats.com/*"],
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.komoot.com/*",
+        "*://*.komoot.de/*",
+        "*://*.komoot.es/*",
+        "*://*.komoot.it/*",
+        "*://*.komoot.fr/*",
+        "*://*.komoot.nl/*"
+      ],
+      "js": [
+        "content/config.js",
+        "content/storage.js",
+        "content/colors.js",
+        "content/throttle.js",
+        "content/fetcher.js",
+        "content/cache.js",
+        "content/main.js"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://squadrats.com/*"],
+      "js": ["content/squadrats-import.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["page/komoot-hook.js", "page/renderer.js", "page/panel.js"],
+      "matches": [
+        "*://*.komoot.com/*",
+        "*://*.komoot.de/*",
+        "*://*.komoot.es/*",
+        "*://*.komoot.it/*",
+        "*://*.komoot.fr/*",
+        "*://*.komoot.nl/*"
+      ]
+    }
+  ],
+  "action": {
+    "default_title": "Squadrats Komoot Overlay",
+    "default_popup": "popup/popup.html"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "squadrats-komoot-overlay@local",
+      "strict_min_version": "109.0"
+    }
+  }
+}
