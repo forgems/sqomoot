@@ -1,7 +1,7 @@
 (function () {
   const sq = (window.sqOverlay = window.sqOverlay || {});
   const cfg = sq.config;
-  const VERSION = "0.1.0";
+  const VERSION = browser.runtime.getManifest().version;
 
   function isSupportedPath() {
     const p = location.pathname;
@@ -35,6 +35,7 @@
 
   function loadTiles(users) {
     const tiles = {};
+    const ubers = {};
     const tasks = users.map(function (u) {
       return sq.throttle.defaultQueue
         .add(function () {
@@ -62,7 +63,12 @@
         });
     });
     return Promise.all(tasks).then(function () {
-      return tiles;
+      for (const uid of Object.keys(tiles)) {
+        const uber = sq.ubersquadrat.maxSquare(tiles[uid][14]);
+        // A 1x1 "ubersquadrat" is just a squadrat, already drawn as a tile.
+        if (uber && uber.size >= 2) ubers[uid] = uber;
+      }
+      return { tiles: tiles, ubers: ubers };
     });
   }
 
@@ -75,8 +81,13 @@
     return sq.storage
       .getUsers()
       .then(function (users) {
-        return loadTiles(users).then(function (tiles) {
-          lastRenderMsg = { type: "SQ_RENDER", users: users, tiles: tiles };
+        return loadTiles(users).then(function (loaded) {
+          lastRenderMsg = {
+            type: "SQ_RENDER",
+            users: users,
+            tiles: loaded.tiles,
+            ubers: loaded.ubers,
+          };
           if (pageReady) sendToPage(lastRenderMsg);
         });
       })

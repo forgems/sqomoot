@@ -10,7 +10,7 @@
   const SWEEP_BUDGET_MS = 100;
 
   let map = null;
-  let lastRender = null; // {users, tiles}
+  let lastRender = null; // {users, tiles, ubers}
   let discoveryTimer = null;
   let sweepCursor = 0;
   const styleWatched = new WeakSet();
@@ -145,7 +145,7 @@
       });
       if (!probe) {
         console.log("[sq-overlay] style changed, re-adding layers");
-        sqp.render(map, lastRender.users, lastRender.tiles);
+        sqp.render(map, lastRender.users, lastRender.tiles, lastRender.ubers);
       }
     }
   }
@@ -158,7 +158,8 @@
         m.on("styledata", onStyleData);
       } catch (e) {}
     }
-    if (lastRender && sqp.render) sqp.render(map, lastRender.users, lastRender.tiles);
+    if (lastRender && sqp.render)
+      sqp.render(map, lastRender.users, lastRender.tiles, lastRender.ubers);
   }
 
   function tick() {
@@ -183,8 +184,9 @@
     const d = e.data;
     if (!d || d.source !== "sq-overlay-cs") return;
     if (d.type === "SQ_RENDER") {
-      lastRender = { users: d.users, tiles: d.tiles };
-      if (map && isLiveMap(map) && sqp.render) sqp.render(map, d.users, d.tiles);
+      lastRender = { users: d.users, tiles: d.tiles, ubers: d.ubers };
+      if (map && isLiveMap(map) && sqp.render)
+        sqp.render(map, d.users, d.tiles, d.ubers);
     }
   });
 

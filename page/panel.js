@@ -6,6 +6,7 @@
   const UID_RE = /^[a-zA-Z0-9]{8,40}$/;
 
   let users = [];
+  let ubers = {}; // uid -> {size, x0, y0, z}
   let addFormOpen = false;
   let helpOpen = false;
   let statusText = "";
@@ -18,6 +19,7 @@
     "  max-height:60vh;overflow:auto;min-width:220px;max-width:280px;padding:8px;}",
     "#" + PANEL_ID + " .sq-row{display:flex;align-items:center;gap:6px;padding:3px 0;}",
     "#" + PANEL_ID + " .sq-name{flex:1;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}",
+    "#" + PANEL_ID + " .sq-uber{font-size:11px;color:#444;background:#eee;border:1px solid #ccc;border-radius:4px;padding:1px 5px;white-space:nowrap;}",
     "#" + PANEL_ID + " .sq-del{cursor:pointer;color:#a33;padding:0 4px;}",
     "#" + PANEL_ID + " input.sq-color{width:22px;height:22px;padding:0;border:1px solid #bbb;border-radius:4px;}",
     "#" + PANEL_ID + " .sq-head{display:flex;align-items:center;gap:6px;font-weight:600;}",
@@ -133,6 +135,22 @@
         };
       };
       row.appendChild(name);
+
+      const uber = ubers[u.uid];
+      if (uber) {
+        const badge = document.createElement("span");
+        badge.className = "sq-uber";
+        badge.textContent = uber.size + "\u00d7" + uber.size;
+        badge.title =
+          "\u00dcbersquadrat: " +
+          uber.size +
+          "\u00d7" +
+          uber.size +
+          " = " +
+          uber.size * uber.size +
+          " squadrats";
+        row.appendChild(badge);
+      }
 
       const del = document.createElement("span");
       del.className = "sq-del";
@@ -294,6 +312,7 @@
     if (!d || d.source !== "sq-overlay-cs") return;
     if (d.type === "SQ_RENDER") {
       users = d.users || [];
+      ubers = d.ubers || {};
       renderPanel();
     } else if (d.type === "SQ_STATUS") {
       statusText = d.message || "";

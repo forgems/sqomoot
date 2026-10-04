@@ -51,6 +51,12 @@ lon = x / 2^z * 360 - 180
 lat = atan(sinh(π * (1 - 2y / 2^z)))
 ```
 
+**Trophy GeoJSON** (`raw.geojson` link above, `squadrats.org/trophies/<UID>/<ts>.geojson`):
+features named `squadrats`, `squadrats-outline`, `yard`, `ubersquadrat`,
+`squadratinhos`, `yardinho`, `ubersquadratinho`, `backyards`, `backyardinhos`,
+each with a `size` property. 0.4–3 MB per user, so we do **not** fetch it; the
+Übersquadrat is computed locally instead (see 2.4).
+
 ### 1.2 Komoot map hook — how it's done (by the official extension, observed)
 
 Komoot's planning map is **MapLibre GL JS inside React**. The official Squadrats
@@ -180,6 +186,46 @@ Optional pre-population from squadrats.com (only if Phase 0 confirms a follow
 endpoint/page): content script harvests `{uid, displayName}` pairs and merges
 them into `sq_users` on demand ("Import follows" button in the popup). Manual
 `+` add remains the primary path and works standalone.
+
+### 2.4 Übersquadrat (implemented)
+
+Übersquadrat = the largest solid square filled with collected squadrats
+(squadrats.com/explain). Computed from the z14 set with the standard
+maximal-square DP, kept sparse so cost is O(n) in collected tiles rather than
+O(bounding-box area):
+
+```
+side(x, y) = 1 + min(side(x-1, y), side(x, y-1), side(x-1, y-1))   // 0 if the tile is not collected
+```
+
+Iterate occupied tiles sorted by (y, x) so predecessors are already known; the
+maximum `side` is the trophy size, its bottom-right tile gives the position.
+Ties keep the topmost/leftmost square.
+
+Verified against Squadrats' own trophy GeoJSON (size and polygon corners):
+
+| UID | z14 tiles | computed | squadrats |
+|---|---|---|---|
+| 2qgThcUD… | 1 117 | 5×5 | 5×5 |
+| fiwoOW0G… | 3 535 | 16×16 | 16×16 |
+| QLlKcXZc… | 5 002 | 33×33 | 33×33 |
+| OddzGnoo… | 8 834 | 45×45 | 45×45 |
+
+Drawn as one line layer `sq-<uid>-uber` (outline only, no fill — a fill would
+darken the already-collected tiles inside it), line width interpolates 1 px at
+zoom 6 → 4 px at zoom 18.
+
+`render()` runs in two passes so the outlines cannot hide each other:
+
+1. every user's z14/z17 fills, inserted below Komoot's labels;
+2. every user's `sq-<uid>-uber` outline, each raised to just below the same
+   insertion point (`moveLayer`, or remove + re-add on builds without it).
+
+Layer order: `… | u1-14 | u1-17 | u2-14 | u2-17 | u1-uber | u2-uber | labels`.
+Doing it per user (fill, fill, outline, next user…) lets the next user's
+translucent fills wash out the previous user's outline.
+Squares of size 1 are skipped (a 1×1 Übersquadrat is just a squadrat).
+The same function works for the z17 set if an Übersquadratinho is ever wanted.
 
 ## 3. Milestones (each independently verifiable)
 

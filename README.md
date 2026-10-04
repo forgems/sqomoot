@@ -23,6 +23,15 @@ implementation; uses Squadrats' unprotected anonymous data endpoint politely
   added to Komoot's MapLibre map as two fill layers per user (z14 lighter
   shade below zoom 12, z17 base color from zoom 11), inserted above the basemap
   and below Komoot's own layers.
+- Übersquadrat: the largest solid square of collected squadrats is computed
+  locally from the z14 set (maximal-square DP over the occupied tiles, O(n),
+  `content/ubersquadrat.js`) — no extra API call. It is drawn as an outline
+  only (no fill), so the squadrats inside it keep their normal shade, and its
+  size shows as a `N×N` badge in the panel row. Outlines are drawn in a second
+  pass above every user's fills, so one user's squares never hide another
+  user's outline. Verified against Squadrats' own trophy GeoJSON: same side
+  length for every UID tested (5×5, 16×16, 33×33, 45×45) and the polygon
+  corners match exactly.
 - Map discovery: content scripts run in an isolated world; a page-world script
   (injected via `web_accessible_resources`) finds the MapLibre instance via
   (1) container `_map` back-reference, (2) React fiber walk from
@@ -46,7 +55,8 @@ select `manifest.json`. (For permanent install, sign via AMO unlisted.)
 2. On a Komoot plan page (`/plan`, tour edit, or discover), click `+` in the
    panel (top-right), paste the UID, optional alias → Add.
 3. Toggle checkboxes to show/hide each user's layers. Click a name to rename,
-   the swatch to recolor, `×` to remove.
+   the swatch to recolor, `×` to remove. A `5×5` badge next to a name is that
+   user's Übersquadrat (their biggest fully collected block of squadrats).
 4. Popup (toolbar icon): same list, plus *Import follows from squadrats.com
    tab* (harvests user links from an open squadrats.com page — heuristic until
    a follow endpoint is confirmed) and *Clear tile cache*.
@@ -63,6 +73,8 @@ select `manifest.json`. (For permanent install, sign via AMO unlisted.)
    `[sq-overlay]` logs; re-adding is instant (IndexedDB cache).
 4. **Renderer**: squares match the same user's map on squadrats.com at z14
    (zoom < 12) and z17 (zoom ≥ 11); Komoot route lines stay visible on top.
+   The Übersquadrat outline sits exactly on that user's trophy square on
+   squadrats.com, and the panel badge equals the size on their profile.
 5. **Panel**: `+` add works without reload; checkbox toggles instantly; list
    survives browser restart.
 6. **Robustness**: layers re-appear after switching Komoot basemap style
@@ -73,7 +85,7 @@ select `manifest.json`. (For permanent install, sign via AMO unlisted.)
 ```
 manifest.json
 assets/    icon-16/32/48/128/180/512.png og.png
-content/   config storage colors throttle fetcher cache main squadrats-import
+content/   config storage colors throttle fetcher cache ubersquadrat main squadrats-import
 page/      komoot-hook renderer panel      (page-world, injected)
 popup/     popup.html popup.js
 docs/      spike-komoot.js

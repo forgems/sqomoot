@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Squadrats Komoot Overlay",
   "description": "Overlay Squadrats of manually added users (UID + alias, stored client-side) on the Komoot planning map.",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "permissions": ["storage"],
   "icons": {
     "16": "assets/icon-16.png",
@@ -28,6 +28,7 @@
         "content/throttle.js",
         "content/fetcher.js",
         "content/cache.js",
+        "content/ubersquadrat.js",
         "content/main.js"
       ],
       "run_at": "document_idle"
