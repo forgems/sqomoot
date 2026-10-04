@@ -49,7 +49,7 @@
       margin: -34px auto 0; max-width: 960px; padding: 0 24px;
     }
     .shot img {
-      width: 100%; display: block; border-radius: 16px;
+      width: 100%; height: auto; display: block; border-radius: 16px;
       border: 1px solid #d8d2f0;
       box-shadow: 0 24px 60px rgba(43, 26, 94, .35);
     }
@@ -102,7 +102,11 @@
   </header>
 
   <figure class="shot">
-    <img src="./screenshot.webp" alt="Sqomoot panel on the Komoot planning map with collected squadrats overlaid in user colors" width="1400" height="1003" />
+    <img src="./screenshot-1x.webp"
+         srcset="./screenshot-1x.webp 1400w, ./screenshot.webp 2231w"
+         sizes="(max-width: 1008px) 100vw, 912px"
+         width="2231" height="1600"
+         alt="Sqomoot panel on the Komoot planning map with collected squadrats overlaid in user colors" />
     <figcaption>The Squadrats panel on the Komoot plan map — users with their colors and their collected tiles.</figcaption>
   </figure>
 
