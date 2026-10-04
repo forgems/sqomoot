@@ -1,0 +1,60 @@
+name: Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Stage extension files
+        run: |
+          mkdir -p dist/ext
+          cp -r manifest.json content page popup dist/ext/
+
+      - name: Build unsigned package
+        run: |
+          (cd dist/ext && zip -qr ../sqomoot-firefox.xpi .)
+
+      - name: Sign with AMO (unlisted)
+        if: ${{ secrets.AMO_API_KEY != '' }}
+        run: |
+          npm install --global web-ext
+          web-ext sign \
+            --source-dir dist/ext \
+            --channel=unlisted \
+            --api-key "${{ secrets.AMO_API_KEY }}" \
+            --api-secret "${{ secrets.AMO_API_SECRET }}" \
+            --artifacts-dir dist/signed
+          cp "$(ls dist/signed/*.xpi | head -n 1)" dist/sqomoot-firefox.xpi
+
+      - name: Assemble site
+        run: |
+          cp dist/sqomoot-firefox.xpi site/
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

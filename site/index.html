@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sqomoot — Squadrats overlay for Komoot</title>
+  <style>
+    body { font: 15px/1.6 system-ui, sans-serif; max-width: 720px; margin: 40px auto; padding: 0 16px; color: #222; }
+    h1 { font-size: 26px; }
+    .dl { display: inline-block; background: #2e7d32; color: #fff; text-decoration: none;
+          padding: 12px 22px; border-radius: 8px; font-weight: 600; }
+    .dl:hover { background: #256428; }
+    code { background: #f2f2f2; padding: 2px 5px; border-radius: 4px; }
+    .note { background: #fff8e1; border: 1px solid #e0c96c; border-radius: 8px; padding: 10px 14px; }
+    ol { padding-left: 22px; }
+    a { color: #1a66cc; }
+  </style>
+</head>
+<body>
+  <h1>Sqomoot</h1>
+  <p>
+    Firefox extension that overlays the collected Squadrats of selected users on
+    the Komoot planning map. Add users by UID with an alias; toggle each user's
+    squares with a checkbox. All data stays on your machine.
+  </p>
+
+  <p><a class="dl" href="./sqomoot-firefox.xpi">Download for Firefox (.xpi)</a></p>
+
+  <h2>Install</h2>
+  <ol>
+    <li>Click the download button above (the file is served from this same site, so Firefox shows the install prompt).</li>
+    <li>Firefox asks: <em>"Add Sqomoot?"</em> → <strong>Add</strong>.</li>
+    <li>Open a Komoot plan page (<code>komoot.com/plan</code>) — the Squadrats panel appears top-right. Click <code>+</code> and paste a Squadrats UID.</li>
+  </ol>
+  <p>
+    If no prompt appears: save the file, then in Firefox use
+    <em>File → Open File…</em> and pick the <code>.xpi</code>.
+  </p>
+
+  <div class="note">
+    <strong>Signing.</strong> Release builds of Firefox only install add-ons
+    signed by Mozilla. If the download above is rejected, the build pipeline has
+    not been configured with AMO signing credentials yet — see
+    <a href="https://github.com/forgems/sqomoot#readme">the repository README</a>
+    (set <code>AMO_API_KEY</code> / <code>AMO_API_SECRET</code> repo secrets and
+    re-run the Pages workflow).
+  </div>
+
+  <p>
+    Source code, usage guide and Chrome install notes:
+    <a href="https://github.com/forgems/sqomoot">github.com/forgems/sqomoot</a>
+  </p>
+</body>
+</html>
