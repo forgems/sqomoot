@@ -5,6 +5,9 @@ of selected users on the Komoot planning map. A floating panel on the map lists
 the users with checkboxes; a `+` button adds a user by Squadrats UID with an
 alias. The user list is stored **only client-side** (`browser.storage.local`).
 
+**Firefox download page:** https://forgems.github.io/sqomoot/ — the signed
+`.xpi` is published there by the `Pages` workflow (see "Publishing" below).
+
 Independent project, not affiliated with Squadrats or Komoot. Clean-room
 implementation; uses Squadrats' unprotected anonymous data endpoint politely
 (cached, throttled).
@@ -74,6 +77,21 @@ page/      komoot-hook renderer panel      (page-world, injected)
 popup/     popup.html popup.js
 docs/      spike-komoot.js
 ```
+
+## Publishing (GitHub Pages)
+
+The `Pages` workflow (`.github/workflows/pages.yml`) builds the Firefox `.xpi`
+and deploys the download site at https://forgems.github.io/sqomoot/ on every
+push to `main` (also `workflow_dispatch`).
+
+- Without secrets: the published `.xpi` is **unsigned** — installs only in
+  Firefox Developer Edition/Nightly or as a temporary add-on.
+- With AMO signing: create credentials at
+  `addons.mozilla.org/developers/addon/api/key/`, store them as repo secrets
+  `AMO_API_KEY` and `AMO_API_SECRET`, re-run the workflow. It then signs the
+  add-on via `web-ext sign --channel=unlisted` and publishes the signed file,
+  which regular Firefox installs from the download page (same-origin link,
+  `application/x-xpinstall` content type).
 
 ## Notes & limits
 
