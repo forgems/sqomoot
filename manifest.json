@@ -2,8 +2,14 @@
   "manifest_version": 3,
   "name": "Squadrats Komoot Overlay",
   "description": "Overlay Squadrats of manually added users (UID + alias, stored client-side) on the Komoot planning map.",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "permissions": ["storage"],
+  "icons": {
+    "16": "assets/icon-16.png",
+    "32": "assets/icon-32.png",
+    "48": "assets/icon-48.png",
+    "128": "assets/icon-128.png"
+  },
   "host_permissions": ["https://squadrats.com/*"],
   "content_scripts": [
     {
@@ -47,6 +53,12 @@
   ],
   "action": {
     "default_title": "Squadrats Komoot Overlay",
+    "default_icon": {
+      "16": "assets/icon-16.png",
+      "32": "assets/icon-32.png",
+      "48": "assets/icon-48.png",
+      "128": "assets/icon-128.png"
+    },
     "default_popup": "popup/popup.html"
   },
   "browser_specific_settings": {

@@ -72,6 +72,7 @@ select `manifest.json`. (For permanent install, sign via AMO unlisted.)
 
 ```
 manifest.json
+assets/    icon-16/32/48/128/180/512.png og.png
 content/   config storage colors throttle fetcher cache main squadrats-import
 page/      komoot-hook renderer panel      (page-world, injected)
 popup/     popup.html popup.js

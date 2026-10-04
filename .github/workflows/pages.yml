@@ -31,7 +31,7 @@ jobs:
       - name: Stage extension files
         run: |
           mkdir -p dist/ext
-          cp -r manifest.json content page popup dist/ext/
+          cp -r manifest.json content page popup assets dist/ext/
 
       - name: Build unsigned package
         run: |

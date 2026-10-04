@@ -4,7 +4,8 @@
   <meta charset="utf-8" />
   <style>
     body { font: 13px/1.4 sans-serif; width: 300px; margin: 0; padding: 10px; }
-    h3 { margin: 0 0 8px; font-size: 14px; }
+    h3 { margin: 0 0 8px; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+    h3 img { width: 22px; height: 22px; }
     .row { display: flex; align-items: center; gap: 6px; padding: 3px 0; }
     .name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .del { cursor: pointer; color: #a33; padding: 0 4px; }
@@ -16,7 +17,7 @@
   </style>
 </head>
 <body>
-  <h3>Squadrats Komoot Overlay</h3>
+  <h3><img src="../assets/icon-32.png" alt="" />Squadrats Komoot Overlay</h3>
   <div id="list"></div>
   <div class="form">
     <input id="uid" placeholder="Squadrats UID" />
