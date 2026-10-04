@@ -80,9 +80,25 @@ docs/      spike-komoot.js
 
 ## Publishing (GitHub Pages)
 
-The `Pages` workflow (`.github/workflows/pages.yml`) builds the Firefox `.xpi`
-and deploys the download site at https://forgems.github.io/sqomoot/ on every
-push to `main` (also `workflow_dispatch`).
+The `Pages` workflow (`.github/workflows/pages.yml`) builds, AMO-signs and
+deploys the download site at https://forgems.github.io/sqomoot/ **only when a
+release tag is pushed** (`v*.*.*`), or via manual `workflow_dispatch`.
+Ordinary pushes to `main` do not publish anything.
+
+Release recipe:
+
+```bash
+# 1. bump version in manifest.json (must be new: AMO rejects duplicate versions)
+git commit -am "release 0.2.0"
+# 2. tag it and push — this triggers build + AMO sign + Pages deploy
+git tag v0.2.0
+git push origin main v0.2.0
+# 3. optional: a GitHub Release with notes (assets live on the Pages site)
+gh release create v0.2.0 -m "What changed..."
+```
+
+The workflow fails fast if the tag (`v0.2.0`) and `manifest.json` version
+disagree.
 
 - Without secrets: the published `.xpi` is **unsigned** — installs only in
   Firefox Developer Edition/Nightly or as a temporary add-on.
@@ -92,9 +108,6 @@ push to `main` (also `workflow_dispatch`).
   add-on via `web-ext sign --channel=unlisted` and publishes the signed file,
   which regular Firefox installs from the download page (same-origin link,
   `application/x-xpinstall` content type).
-- AMO rejects re-submitting an existing version. Bump `version` in
-  `manifest.json` whenever you want a new signed build published; otherwise the
-  signing step fails with `Version X already exists`.
 
 ## Notes & limits
 
