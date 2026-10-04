@@ -29,8 +29,15 @@ jobs:
         run: |
           (cd dist/ext && zip -qr ../sqomoot-firefox.xpi .)
 
+      - name: Check AMO signing credentials
+        id: signing
+        env:
+          AMO_KEY: ${{ secrets.AMO_API_KEY }}
+        run: |
+          if [ -n "$AMO_KEY" ]; then echo present=true >> "$GITHUB_OUTPUT"; else echo present=false >> "$GITHUB_OUTPUT"; fi
+
       - name: Sign with AMO (unlisted)
-        if: ${{ secrets.AMO_API_KEY != '' }}
+        if: steps.signing.outputs.present == 'true'
         run: |
           npm install --global web-ext
           web-ext sign \
