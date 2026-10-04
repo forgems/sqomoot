@@ -4,51 +4,151 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Sqomoot — Squadrats overlay for Komoot</title>
+  <meta name="description" content="Firefox extension that overlays collected Squadrats of selected users on the Komoot planning map." />
   <style>
-    body { font: 15px/1.6 system-ui, sans-serif; max-width: 720px; margin: 40px auto; padding: 0 16px; color: #222; }
-    h1 { font-size: 26px; }
-    .dl { display: inline-block; background: #2e7d32; color: #fff; text-decoration: none;
-          padding: 12px 22px; border-radius: 8px; font-weight: 600; }
-    .dl:hover { background: #256428; }
-    code { background: #f2f2f2; padding: 2px 5px; border-radius: 4px; }
-    .note { background: #fff8e1; border: 1px solid #e0c96c; border-radius: 8px; padding: 10px 14px; }
-    ol { padding-left: 22px; }
-    a { color: #1a66cc; }
+    :root {
+      --violet: #7c4dff;
+      --violet-deep: #4527a0;
+      --green: #00c853;
+      --green-deep: #1b5e20;
+      --ink: #1c1530;
+      --paper: #f6f4ff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font: 16px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background: var(--paper);
+    }
+    .hero {
+      background:
+        radial-gradient(1200px 500px at 85% -10%, rgba(0, 200, 83, .35), transparent 60%),
+        radial-gradient(900px 500px at 10% 110%, rgba(124, 77, 255, .45), transparent 60%),
+        linear-gradient(135deg, #2b1a5e 0%, #4527a0 55%, #1b5e20 130%);
+      color: #fff;
+      padding: 64px 24px 56px;
+    }
+    .wrap { max-width: 960px; margin: 0 auto; }
+    .hero h1 { font-size: 44px; margin: 0 0 6px; letter-spacing: -1px; }
+    .hero .tag {
+      display: inline-block; font-size: 13px; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase; color: #d1c4ff; margin-bottom: 14px;
+    }
+    .hero p { font-size: 19px; max-width: 640px; color: #e6e0ff; margin: 0 0 28px; }
+    .dl {
+      display: inline-block; text-decoration: none; font-weight: 700; font-size: 18px;
+      color: #10261a; background: linear-gradient(135deg, #69f0ae, #00c853);
+      padding: 15px 30px; border-radius: 14px;
+      box-shadow: 0 10px 30px rgba(0, 200, 83, .45), inset 0 1px 0 rgba(255,255,255,.5);
+      transition: transform .12s ease, box-shadow .12s ease;
+    }
+    .dl:hover { transform: translateY(-2px); box-shadow: 0 14px 36px rgba(0, 200, 83, .55), inset 0 1px 0 rgba(255,255,255,.5); }
+    .dl small { display: block; font-weight: 500; font-size: 12px; opacity: .75; }
+    .shot {
+      margin: -34px auto 0; max-width: 960px; padding: 0 24px;
+    }
+    .shot img {
+      width: 100%; display: block; border-radius: 16px;
+      border: 1px solid #d8d2f0;
+      box-shadow: 0 24px 60px rgba(43, 26, 94, .35);
+    }
+    .shot figcaption { text-align: center; color: #6b6390; font-size: 14px; margin-top: 10px; }
+    main { padding: 40px 24px 24px; }
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 40px; }
+    .card {
+      background: #fff; border: 1px solid #e4def8; border-radius: 14px; padding: 18px 20px;
+      box-shadow: 0 6px 18px rgba(43, 26, 94, .08);
+    }
+    .card .ico { font-size: 26px; }
+    .card h3 { margin: 8px 0 4px; font-size: 17px; }
+    .card p { margin: 0; color: #5b5478; font-size: 14.5px; }
+    h2 { font-size: 24px; margin: 32px 0 14px; }
+    ol.steps { list-style: none; counter-reset: step; margin: 0; padding: 0; }
+    ol.steps li {
+      counter-increment: step; position: relative; padding: 14px 16px 14px 58px;
+      background: #fff; border: 1px solid #e4def8; border-radius: 12px; margin-bottom: 10px;
+    }
+    ol.steps li::before {
+      content: counter(step); position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+      width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center;
+      font-weight: 700; color: #fff; background: linear-gradient(135deg, var(--violet), var(--green));
+    }
+    code { background: #eee8ff; color: #3f2d80; padding: 2px 6px; border-radius: 5px; font-size: 14px; }
+    .note {
+      background: #fff7e6; border: 1px solid #f0d48a; border-radius: 12px;
+      padding: 14px 18px; font-size: 14.5px; color: #6b5518;
+    }
+    .note strong { color: #8a6a1d; }
+    footer { padding: 24px; text-align: center; color: #8b84a8; font-size: 14px; }
+    footer a { color: var(--violet-deep); }
+    a { color: #3f2d80; }
   </style>
 </head>
 <body>
-  <h1>Sqomoot</h1>
-  <p>
-    Firefox extension that overlays the collected Squadrats of selected users on
-    the Komoot planning map. Add users by UID with an alias; toggle each user's
-    squares with a checkbox. All data stays on your machine.
-  </p>
 
-  <p><a class="dl" href="./sqomoot-firefox.xpi">Download for Firefox (.xpi)</a></p>
+  <header class="hero">
+    <div class="wrap">
+      <span class="tag">Firefox extension</span>
+      <h1>Sqomoot</h1>
+      <p>See the <strong>squadrats your friends have collected</strong> right on the
+      Komoot planning map. Add users by UID, toggle their squares with a checkbox,
+      color-code each rider. Your list never leaves your machine.</p>
+      <a class="dl" href="./sqomoot-firefox.xpi">
+        Download for Firefox
+        <small>sqomoot-firefox.xpi</small>
+      </a>
+    </div>
+  </header>
 
-  <h2>Install</h2>
-  <ol>
-    <li>Click the download button above (the file is served from this same site, so Firefox shows the install prompt).</li>
-    <li>Firefox asks: <em>"Add Sqomoot?"</em> → <strong>Add</strong>.</li>
-    <li>Open a Komoot plan page (<code>komoot.com/plan</code>) — the Squadrats panel appears top-right. Click <code>+</code> and paste a Squadrats UID.</li>
-  </ol>
-  <p>
-    If no prompt appears: save the file, then in Firefox use
-    <em>File → Open File…</em> and pick the <code>.xpi</code>.
-  </p>
+  <figure class="shot">
+    <img src="./screenshot.webp" alt="Sqomoot panel on the Komoot planning map with collected squadrats overlaid in user colors" width="1400" height="1003" />
+    <figcaption>The Squadrats panel on the Komoot plan map — users with their colors and their collected tiles.</figcaption>
+  </figure>
 
-  <div class="note">
-    <strong>Signing.</strong> Release builds of Firefox only install add-ons
-    signed by Mozilla. If the download above is rejected, the build pipeline has
-    not been configured with AMO signing credentials yet — see
-    <a href="https://github.com/forgems/sqomoot#readme">the repository README</a>
-    (set <code>AMO_API_KEY</code> / <code>AMO_API_SECRET</code> repo secrets and
-    re-run the Pages workflow).
-  </div>
+  <main class="wrap">
+    <div class="cards">
+      <div class="card">
+        <div class="ico">🗺️</div>
+        <h3>Two levels of detail</h3>
+        <p>Big squares (z14, ~1.5 km) at continent zoom, fine squadratinhos (z17) when you zoom in — just like squadrats.com.</p>
+      </div>
+      <div class="card">
+        <div class="ico">🔒</div>
+        <h3>Stays on your machine</h3>
+        <p>No accounts, no servers. Users, aliases and tile caches live only in your browser's local storage.</p>
+      </div>
+      <div class="card">
+        <div class="ico">⚡</div>
+        <h3>Fast &amp; polite</h3>
+        <p>Tile data is cached for 24 h, requests are throttled, and layers re-appear automatically after Komoot style switches.</p>
+      </div>
+    </div>
 
-  <p>
-    Source code, usage guide and Chrome install notes:
+    <h2>Install</h2>
+    <ol class="steps">
+      <li>Click the green download button above — Firefox shows an <em>“Add Sqomoot?”</em> prompt.</li>
+      <li>Click <strong>Add</strong>. The extension appears in the toolbar.</li>
+      <li>Open a Komoot plan page (<code>komoot.com/plan</code>) — the Squadrats panel appears at the top right.</li>
+      <li>Find a UID: open <code>squadrats.com</code>, click any profile — the URL reads <code>/u/&lt;UID&gt;</code>.</li>
+      <li>Click <code>+</code> in the panel, paste the UID, add an optional alias. Done — toggle users with checkboxes.</li>
+    </ol>
+    <p>If no prompt appears: save the file, then in Firefox choose <em>File → Open File…</em> and pick the <code>.xpi</code>.</p>
+
+    <div class="note">
+      <strong>Signing.</strong> Release builds of Firefox only install add-ons signed
+      by Mozilla. If the download is rejected, AMO signing credentials are not yet
+      configured in the build pipeline — set <code>AMO_API_KEY</code> /
+      <code>AMO_API_SECRET</code> repo secrets and re-run the Pages workflow. See the
+      repository README for details.
+    </div>
+  </main>
+
+  <footer>
+    Source code &amp; Chrome install notes:
     <a href="https://github.com/forgems/sqomoot">github.com/forgems/sqomoot</a>
-  </p>
+    · Independent project, not affiliated with Squadrats or Komoot.
+  </footer>
+
 </body>
 </html>
