@@ -92,6 +92,9 @@ push to `main` (also `workflow_dispatch`).
   add-on via `web-ext sign --channel=unlisted` and publishes the signed file,
   which regular Firefox installs from the download page (same-origin link,
   `application/x-xpinstall` content type).
+- AMO rejects re-submitting an existing version. Bump `version` in
+  `manifest.json` whenever you want a new signed build published; otherwise the
+  signing step fails with `Version X already exists`.
 
 ## Notes & limits
 
