@@ -2,7 +2,9 @@
 (function () {
   const sqp = (window.sqPage = window.sqPage || {});
 
-  const ALPHA14 = ["interpolate", ["linear"], ["zoom"], 10, 0.75, 12, 0.45];
+  // z14 fills stay visible at every zoom (they are the collected squadrats),
+  // fading as they grow huge on screen so z17 detail stays readable.
+  const ALPHA14 = ["interpolate", ["linear"], ["zoom"], 10, 0.75, 12, 0.45, 14, 0.3, 16, 0.2, 18, 0.15];
   const ALPHA17 = ["interpolate", ["linear"], ["zoom"], 11, 0.55, 13, 0.4, 16, 0.3];
   const UBER_LINE_WIDTH = ["interpolate", ["linear"], ["zoom"], 6, 1, 12, 2, 18, 4];
   const BASE_LAYER_RE =
@@ -132,7 +134,6 @@
               type: "fill",
               source: srcId,
               filter: ["==", ["get", "z"], 14],
-              maxzoom: 12,
               paint: { "fill-color": lighten(u.color, 0.4), "fill-opacity": ALPHA14 },
             },
             beforeId

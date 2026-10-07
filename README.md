@@ -21,8 +21,8 @@ implementation; uses Squadrats' unprotected anonymous data endpoint politely
   max 3 concurrent fetches, 429 backoff.
 - Rendering: indices are turned into GeoJSON rectangles (Web Mercator math) and
   added to Komoot's MapLibre map as two fill layers per user (z14 lighter
-  shade below zoom 12, z17 base color from zoom 11), inserted above the basemap
-  and below Komoot's own layers.
+  shade at every zoom, fading as it grows; z17 base color from zoom 11),
+  inserted above the basemap and below Komoot's own layers.
 - Übersquadrat: the largest solid square of collected squadrats is computed
   locally from the z14 set (maximal-square DP over the occupied tiles, O(n),
   `content/ubersquadrat.js`) — no extra API call. It is drawn as an outline
