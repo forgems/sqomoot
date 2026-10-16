@@ -13,7 +13,9 @@
 
   const style = document.createElement("style");
   style.textContent = [
-    "#" + PANEL_ID + "{position:fixed;top:70px;right:12px;z-index:2147483647;",
+    // Leave the top stacking level for Komoot's portalled tooltips/popovers.
+    "[data-floating-ui-portal]{position:relative;z-index:2147483647!important;}",
+    "#" + PANEL_ID + "{position:fixed;top:70px;right:12px;z-index:2147483646;",
     "  background:#fff;color:#222;border:1px solid #ccc;border-radius:8px;",
     "  box-shadow:0 2px 10px rgba(0,0,0,.25);font:13px/1.4 sans-serif;",
     "  max-height:60vh;overflow:auto;min-width:220px;max-width:280px;padding:8px;}",
