@@ -3,6 +3,7 @@
   const sqp = (window.sqPage = window.sqPage || {});
 
   const PANEL_ID = "sq-overlay-panel";
+  const POSITION_KEY = "sq-overlay-panel-position";
   const UID_RE = /^[a-zA-Z0-9]{8,40}$/;
 
   let users = [];
@@ -13,7 +14,9 @@
 
   const style = document.createElement("style");
   style.textContent = [
-    "#" + PANEL_ID + "{position:fixed;top:70px;right:12px;z-index:2147483647;",
+    // Leave the top stacking level for Komoot's portalled tooltips/popovers.
+    "[data-floating-ui-portal]{position:relative;z-index:2147483647!important;}",
+    "#" + PANEL_ID + "{position:fixed;top:70px;right:12px;z-index:2147483646;",
     "  background:#fff;color:#222;border:1px solid #ccc;border-radius:8px;",
     "  box-shadow:0 2px 10px rgba(0,0,0,.25);font:13px/1.4 sans-serif;",
     "  max-height:60vh;overflow:auto;min-width:220px;max-width:280px;padding:8px;}",
@@ -52,6 +55,16 @@
       el = document.createElement("div");
       el.id = PANEL_ID;
       document.body.appendChild(el);
+      try {
+        const position = JSON.parse(localStorage.getItem(POSITION_KEY));
+        if (position && Number.isFinite(position.left) && Number.isFinite(position.top)) {
+          el.style.left = position.left + "px";
+          el.style.top = position.top + "px";
+          el.style.right = "auto";
+        }
+      } catch (_) {
+        // Storage may be unavailable or contain an invalid saved position.
+      }
     }
     return el;
   }
@@ -266,6 +279,17 @@
       st.textContent = statusText;
       el.appendChild(st);
     }
+
+    if (el.style.left) {
+      setPanelPosition(el, parseFloat(el.style.left), parseFloat(el.style.top));
+    }
+  }
+
+  function setPanelPosition(el, left, top) {
+    const rect = el.getBoundingClientRect();
+    el.style.left = Math.max(4, Math.min(left, window.innerWidth - rect.width - 4)) + "px";
+    el.style.top = Math.max(4, Math.min(top, window.innerHeight - 40)) + "px";
+    el.style.right = "auto";
   }
 
   // Drag the panel by its handle. Switches from right-anchored to
@@ -280,28 +304,34 @@
       const offY = down.clientY - rect.top;
       handle.setPointerCapture(down.pointerId);
 
+      let moved = false;
       function onMove(e) {
-        const left = Math.min(
-          Math.max(e.clientX - offX, 4),
-          window.innerWidth - rect.width - 4
-        );
-        const top = Math.min(
-          Math.max(e.clientY - offY, 4),
-          window.innerHeight - 40
-        );
-        el.style.left = left + "px";
-        el.style.top = top + "px";
-        el.style.right = "auto";
+        moved = true;
+        setPanelPosition(el, e.clientX - offX, e.clientY - offY);
       }
 
-      function onUp(e) {
-        handle.releasePointerCapture(down.pointerId);
+      function onUp() {
+        if (handle.hasPointerCapture(down.pointerId)) {
+          handle.releasePointerCapture(down.pointerId);
+        }
         handle.removeEventListener("pointermove", onMove);
         handle.removeEventListener("pointerup", onUp);
+        handle.removeEventListener("pointercancel", onUp);
+        if (moved) {
+          try {
+            localStorage.setItem(POSITION_KEY, JSON.stringify({
+              left: parseFloat(el.style.left),
+              top: parseFloat(el.style.top),
+            }));
+          } catch (_) {
+            // Keep dragging functional even when storage is unavailable.
+          }
+        }
       }
 
       handle.addEventListener("pointermove", onMove);
       handle.addEventListener("pointerup", onUp);
+      handle.addEventListener("pointercancel", onUp);
       down.preventDefault();
     });
   }
